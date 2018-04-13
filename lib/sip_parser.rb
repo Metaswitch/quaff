@@ -153,8 +153,17 @@ module Quaff
       Concat.new(user, Char.new(?@))
     end
 
+    def ipv6address
+      # Need to allow . as [ff::127.0.0.1] is valid according to RFC 3261
+      Repetition.new([:at_least, 1], Alternate.new(HexDigit.new, AlternateChars.new(".:")))
+    end
+
+    def ipv6reference
+      Concat.new(Char.new(?[), ipv6address, Char.new(?]))
+    end
+
     def hostname
-      Repetition.new([:at_least, 1], Alternate.new(alphanum, Char.new(?.), Char.new(?-)))
+      Alternate.new(ipv6reference, Repetition.new([:at_least, 1], Alternate.new(alphanum, Char.new(?.), Char.new(?-))))
     end
 
     def port
